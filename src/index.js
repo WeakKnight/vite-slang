@@ -1,7 +1,7 @@
 import { transformWithEsbuild } from 'vite'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
-import slangModule from './slang-2025.15-wasm/slang-wasm.js'
+import slangModule from './slang-2025.17-wasm/slang-wasm.js'
 
 /**
  * Tests a Vite filter against a file id.
@@ -34,10 +34,10 @@ const SLANG_STAGES = {
 
 const IMPORT_REGEX = /^\s*#include\s+"([^"]+)"/gm
 
-/** @type {Promise<import('./slang-2025.15-wasm/slang-wasm.js').MainModule> | null} */
+/** @type {Promise<import('./slang-2025.17-wasm/slang-wasm.js').MainModule> | null} */
 let slangPromise = null
 
-/** @type {import('./slang-2025.15-wasm/slang-wasm.js').GlobalSession | null} */
+/** @type {import('./slang-2025.17-wasm/slang-wasm.js').GlobalSession | null} */
 let globalSession = null
 
 /**
@@ -61,7 +61,7 @@ function viteSlang(options) {
         // https://github.com/CodyJasonBennett/vite-slang/issues/1
         if (!testFilter(id, options.filter)) return
 
-        /** @type {import('./slang-2025.15-wasm/slang-wasm.js').Session | null} */
+        /** @type {import('./slang-2025.17-wasm/slang-wasm.js').Session | null} */
         let session = null
 
         try {
@@ -86,7 +86,7 @@ function viteSlang(options) {
             throw new Error(`Unable to create Slang session for ${options.target} target. Please file an issue.`)
           }
 
-          /** @type {import('./slang-2025.15-wasm/slang-wasm.js').Module | null} */
+          /** @type {import('./slang-2025.17-wasm/slang-wasm.js').Module | null} */
           const module = session.loadModuleFromSource(
             // Resolve #include directives
             code.replaceAll(IMPORT_REGEX, (match, file) => {
@@ -116,12 +116,12 @@ function viteSlang(options) {
 
           // Link shader entrypoints
           // TODO: surely, there's a better way to reflect the program and get a top-level layout?
-          /** @type {import('./slang-2025.15-wasm/slang-wasm.js').Module[]} */
+          /** @type {import('./slang-2025.17-wasm/slang-wasm.js').Module[]} */
           const components = [module]
           for (let i = 0; i < count; i++) {
-            /** @type {import('./slang-2025.15-wasm/slang-wasm.js').EntryPoint} */
+            /** @type {import('./slang-2025.17-wasm/slang-wasm.js').EntryPoint} */
             const entryPoint = module.getDefinedEntryPoint(i)
-            /** @type {import('./slang-2025.15-wasm/slang-wasm.js').ComponentType} */
+            /** @type {import('./slang-2025.17-wasm/slang-wasm.js').ComponentType} */
             const program = session.createCompositeComponentType([entryPoint, 1])
             const layout = program.getLayout(0).toJsonObject()
             const { name, stage } = layout.entryPoints[0]
@@ -129,7 +129,7 @@ function viteSlang(options) {
           }
 
           // Compile shader with reflection
-          /** @type {import('./slang-2025.15-wasm/slang-wasm.js').ComponentType} */
+          /** @type {import('./slang-2025.17-wasm/slang-wasm.js').ComponentType} */
           const linkedProgram = session.createCompositeComponentType(components).link()
           const shader = linkedProgram.getTargetCode(0)
           const reflection = linkedProgram.getLayout(0).toJsonObject()

@@ -20,7 +20,8 @@
   "repository": "https://github.com/CodyJasonBennett/vite-slang",
   "license": "MIT",
   "files": [
-    "src/*"
+    "src/*",
+    "platforms/**/*"
   ],
   "type": "module",
   "types": "./src/index.d.ts",
